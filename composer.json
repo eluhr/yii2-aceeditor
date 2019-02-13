@@ -1,6 +1,5 @@
 {
   "name": "eluhr/yii2-aceeditor",
-  "version": "0.0.1",
   "description": "Yii2 wrapper for ace editor",
   "keywords": [
     "yii2",
