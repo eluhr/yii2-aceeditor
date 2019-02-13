@@ -22,6 +22,7 @@ use yii\widgets\InputWidget;
  * @property array $container_options
  * @property bool $read_only
  * @property bool $autocomplete
+ * @property bool $remember_position
  * @property array $plugin_options
  * @property array $extensions
  *
@@ -56,6 +57,12 @@ class AceEditor extends InputWidget
      * Turn autocomplete on or off
      */
     public $autocomplete = true;
+
+    /**
+     * @var bool
+     * Remembers current position in editor on reload
+     */
+    public $remember_position = true;
 
     /**
      * @var array
@@ -131,7 +138,6 @@ class AceEditor extends InputWidget
         // initialize ace editor 
         $this->view->registerJs('var ' . $editor_variable . ' = ace.edit("' . $this->container_options['id'] . '");');
 
-
         // set theme and mode
         $this->view->registerJs($editor_variable . '.setTheme("ace/theme/' . $this->theme . '");');
         $this->view->registerJs($editor_variable . '.getSession().setMode("ace/mode/' . $this->mode . '");');
@@ -140,6 +146,24 @@ class AceEditor extends InputWidget
         if (!empty($this->plugin_options)) {
             $this->view->registerJs($editor_variable . '.setOptions(' . Json::encode($this->plugin_options) . ');');
         }
+        $additional_update_script = "";
+        if ($this->remember_position) {
+            $uuid = md5(isset($this->model) ? Html::getInputId($this->model, $this->attribute) : $this->id);
+            $this->view->registerJs(<<<JS
+var cursorPos = JSON.parse(localStorage.getItem("{$uuid}"));
+if (cursorPos !== null) {
+    {$editor_variable}.focus();
+    setTimeout(function() {
+      {$editor_variable}.gotoLine(cursorPos.row + 1, cursorPos.column);
+    },0);
+}
+JS
+            );
+
+            $additional_update_script = <<<JS
+localStorage.setItem("{$uuid}",JSON.stringify({$editor_variable}.getCursorPosition()));
+JS;
+        }
 
         $textarea_variable = 'ace_textarea_' . $this->container_options['id'];
 
@@ -147,8 +171,9 @@ class AceEditor extends InputWidget
         $this->view->registerJs(<<<JS
 var {$textarea_variable} = document.getElementById("{$this->options['id']}");
 {$editor_variable}.getSession().setValue({$textarea_variable}.value);
-document.addEventListener('change', function() {
+document.addEventListener("change", function() {
   {$textarea_variable}.value = {$editor_variable}.getSession().getValue();
+  {$additional_update_script}
 });
 JS
         );
