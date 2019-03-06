@@ -3,6 +3,7 @@
 namespace eluhr\aceeditor\widgets;
 
 use eluhr\aceeditor\assets\AceEditorAsset;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -148,7 +149,7 @@ class AceEditor extends InputWidget
         }
         $additional_update_script = "";
         if ($this->remember_position) {
-            $uuid = md5(isset($this->model) ? Html::getInputId($this->model, $this->attribute) : $this->id);
+            $uuid = md5((isset($this->model) ? Html::getInputId($this->model, $this->attribute) : $this->id) . Yii::$app->id);
             $this->view->registerJs(<<<JS
 var cursorPos = JSON.parse(localStorage.getItem("{$uuid}"));
 if (cursorPos !== null) {
@@ -171,7 +172,7 @@ JS;
         $this->view->registerJs(<<<JS
 var {$textarea_variable} = document.getElementById("{$this->options['id']}");
 {$editor_variable}.getSession().setValue({$textarea_variable}.value);
-document.addEventListener("change", function() {
+{$editor_variable}.getSession().addEventListener("change", function() {
   {$textarea_variable}.value = {$editor_variable}.getSession().getValue();
   {$additional_update_script}
 });
