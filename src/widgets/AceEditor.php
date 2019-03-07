@@ -147,7 +147,7 @@ class AceEditor extends InputWidget
         if (!empty($this->plugin_options)) {
             $this->view->registerJs($editor_variable . '.setOptions(' . Json::encode($this->plugin_options) . ');');
         }
-        $additional_update_script = "";
+        $additional_update_script = '';
         if ($this->remember_position) {
             $uuid = md5((isset($this->model) ? Html::getInputId($this->model, $this->attribute) : $this->id) . Yii::$app->id);
             $this->view->registerJs(<<<JS
