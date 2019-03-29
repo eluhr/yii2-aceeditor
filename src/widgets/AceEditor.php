@@ -92,14 +92,14 @@ class AceEditor extends InputWidget
         parent::init();
 
         // set editor html element id to widget id
-        $this->container_options['id'] = $this->id;
-        $this->options['id'] = 'textarea-' . $this->container_options['id'];
+        $this->container_options['id'] = $this->container_options['id'] ?? $this->id;
+        $this->options['id'] = $this->options['id'] ?? 'textarea-' . $this->container_options['id'];
 
         // hide textarea
         Html::addCssStyle($this->options, 'display: none');
 
         // add default size for editor
-        $this->container_options['style'] = 'width: 100%; min-height: 400px';
+        $this->container_options['style'] = $this->container_options['style'] ?? 'width: 100%; min-height: 400px';
 
 
         if ($this->autocomplete) {
