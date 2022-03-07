@@ -9,6 +9,7 @@ composer require eluhr/yii2-aceeditor
 ### Usuage
 
 without a model
+
 ```php
 <?= AceEditor::widget([
     'name' => 'editor'
